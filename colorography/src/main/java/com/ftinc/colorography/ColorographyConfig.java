@@ -1,11 +1,24 @@
 package com.ftinc.colorography;
 
-import android.widget.TextView;
+import android.view.View;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import com.ftinc.colorography.widget.AppCompatButtonWidgetFactory;
+import com.ftinc.colorography.widget.AppCompatCheckBoxWidgetFactory;
+import com.ftinc.colorography.widget.AppCompatEditTextWidgetFactory;
+import com.ftinc.colorography.widget.AppCompatRadioButtonWidgetFactory;
+import com.ftinc.colorography.widget.AppCompatRatingBarWidgetFactory;
+import com.ftinc.colorography.widget.CardViewWidgetFactory;
+import com.ftinc.colorography.widget.CollapsingToolbarLayoutWidgetFactory;
+import com.ftinc.colorography.widget.DefaultWidgetFactory;
+import com.ftinc.colorography.widget.FloatingActionButtonWidgetFactory;
+import com.ftinc.colorography.widget.ProgressBarWidgetFactory;
+import com.ftinc.colorography.widget.SwitchCompatWidgetFactory;
+import com.ftinc.colorography.widget.TextViewWidgetFactory;
+import com.ftinc.colorography.widget.WidgetFactory;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 
 /**
@@ -13,6 +26,23 @@ import java.util.Set;
  * Project: Calligraphy
  */
 public class ColorographyConfig {
+
+    private static final List<WidgetFactory<? extends View>> DEFAULT_FACTORIES = new ArrayList<>();
+
+    static {
+        DEFAULT_FACTORIES.add(new FloatingActionButtonWidgetFactory());
+        DEFAULT_FACTORIES.add(new CollapsingToolbarLayoutWidgetFactory());
+        DEFAULT_FACTORIES.add(new AppCompatButtonWidgetFactory());
+        DEFAULT_FACTORIES.add(new AppCompatCheckBoxWidgetFactory());
+        DEFAULT_FACTORIES.add(new AppCompatEditTextWidgetFactory());
+        DEFAULT_FACTORIES.add(new AppCompatRadioButtonWidgetFactory());
+        DEFAULT_FACTORIES.add(new AppCompatRatingBarWidgetFactory());
+        DEFAULT_FACTORIES.add(new CardViewWidgetFactory());
+        DEFAULT_FACTORIES.add(new ProgressBarWidgetFactory());
+        DEFAULT_FACTORIES.add(new SwitchCompatWidgetFactory());
+        DEFAULT_FACTORIES.add(new TextViewWidgetFactory());
+        DEFAULT_FACTORIES.add(new DefaultWidgetFactory());
+    }
 
 
     private static ColorographyConfig sInstance;
@@ -48,9 +78,15 @@ public class ColorographyConfig {
     private final boolean mCustomViewCreation;
 
 
+    private final List<WidgetFactory<? extends View>> mWidgetFactories;
+
+
     protected ColorographyConfig(Builder builder) {
         mAttrId = builder.attrId;
         mCustomViewCreation = builder.customViewCreation;
+        final List<WidgetFactory<? extends View>> tempList = new ArrayList<>(DEFAULT_FACTORIES);
+        tempList.addAll(builder.mWidgetFactoryList);
+        mWidgetFactories = Collections.unmodifiableList(tempList);
     }
 
 
@@ -67,13 +103,17 @@ public class ColorographyConfig {
     }
 
 
+    public List<WidgetFactory<? extends View>> getWidgetFactories() {
+        return mWidgetFactories;
+    }
+
+
     public static class Builder {
         public static final int INVALID_ATTR_ID = -1;
         private boolean customViewCreation = true;
-        private int attrId = R.attr.fontPath;
+        private int attrId = R.attr.themeColor;
 
-        private Map<Class<? extends TextView>, Integer> mStyleClassMap = new HashMap<>();
-        private Set<Class<?>> mHasTypefaceClasses = new HashSet<>();
+        private List<WidgetFactory<? extends View>> mWidgetFactoryList = new ArrayList<>();
 
         /**
          * This defaults to R.attr.fontPath. So only override if you want to use your own attrId.
@@ -115,25 +155,9 @@ public class ColorographyConfig {
             return this;
         }
 
-        /**
-         * Add a custom style to get looked up. If you use a custom class that has a parent style
-         * which is not part of the default android styles you will need to add it here.
-         *
-         * The Calligraphy inflater is unaware of custom styles in your custom classes. We use
-         * the class type to look up the style attribute in the theme resources.
-         *
-         * So if you had a {@code MyTextField.class} which looked up it's default style as
-         * {@code R.attr.textFieldStyle} you would add those here.
-         *
-         * {@code builder.addCustomStyle(MyTextField.class,R.attr.textFieldStyle}
-         *
-         * @param styleClass             the class that related to the parent styleResource. null is ignored.
-         * @param styleResourceAttribute e.g. {@code R.attr.textFieldStyle}, 0 is ignored.
-         * @return this builder.
-         */
-        public Builder addCustomStyle(final Class<? extends TextView> styleClass, final int styleResourceAttribute) {
-            if (styleClass == null || styleResourceAttribute == 0) return this;
-            mStyleClassMap.put(styleClass, styleResourceAttribute);
+
+        public Builder addCustomWidgetFactory(final WidgetFactory<? extends View> widgetFactory) {
+            mWidgetFactoryList.add(widgetFactory);
             return this;
         }
 
