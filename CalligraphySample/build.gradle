@@ -23,7 +23,7 @@ android {
 }
 
 dependencies {
-    compile project(':calligraphy')
+    compile project(':colorography')
     compile "com.android.support:support-v4:${supportLibraryVersion}"
     compile "com.android.support:appcompat-v7:${supportLibraryVersion}"
 

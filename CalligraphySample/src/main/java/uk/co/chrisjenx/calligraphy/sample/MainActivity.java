@@ -7,7 +7,7 @@ import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+import com.ftinc.colorography.ColorographyContextWrapper;
 
 import static butterknife.ButterKnife.findById;
 
@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+        super.attachBaseContext(ColorographyContextWrapper.wrap(newBase));
     }
 
 }

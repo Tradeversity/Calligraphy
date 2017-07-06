@@ -1,4 +1,4 @@
-package uk.co.chrisjenx.calligraphy;
+package com.ftinc.colorography;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -8,7 +8,7 @@ import android.view.View;
  * Created by chris on 09/11/14.
  * For Calligraphy.
  */
-interface CalligraphyActivityFactory {
+interface ColorographyActivityFactory {
 
     /**
      * Used to Wrap the Activity onCreateView method.

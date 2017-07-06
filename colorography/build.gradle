@@ -1,5 +1,4 @@
 apply plugin: 'com.android.library'
-apply from: rootProject.file('gradle/deploy.gradle')
 
 android {
     compileSdkVersion project.compileSdkVersion
@@ -23,4 +22,9 @@ android {
 
 dependencies {
     compile "com.android.support:appcompat-v7:${supportLibraryVersion}"
+    compile "com.android.support:design:${supportLibraryVersion}"
+    compile "com.android.support:cardview-v7:${supportLibraryVersion}"
 }
+
+//apply from: rootProject.file('gradle/deploy.gradle')
+apply from: 'https://raw.github.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'

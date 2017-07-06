@@ -1,4 +1,4 @@
-package uk.co.chrisjenx.calligraphy;
+package com.ftinc.colorography;
 
 import android.util.Log;
 

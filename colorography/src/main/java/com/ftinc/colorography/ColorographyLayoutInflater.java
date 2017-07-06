@@ -1,4 +1,4 @@
-package uk.co.chrisjenx.calligraphy;
+package com.ftinc.colorography;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -17,36 +17,43 @@ import java.lang.reflect.Method;
  * Created by chris on 19/12/2013
  * Project: Calligraphy
  */
-class CalligraphyLayoutInflater extends LayoutInflater implements CalligraphyActivityFactory {
+class ColorographyLayoutInflater extends LayoutInflater implements ColorographyActivityFactory {
 
     private static final String[] sClassPrefixList = {
             "android.widget.",
             "android.webkit."
     };
 
+
     private final int mAttributeId;
-    private final CalligraphyFactory mCalligraphyFactory;
+    private final int mThemeColor;
+    private final ColorographyFactory mCalligraphyFactory;
     // Reflection Hax
     private boolean mSetPrivateFactory = false;
     private Field mConstructorArgs = null;
 
-    protected CalligraphyLayoutInflater(Context context, int attributeId) {
+
+    protected ColorographyLayoutInflater(Context context, int attributeId, int themeColor) {
         super(context);
         mAttributeId = attributeId;
-        mCalligraphyFactory = new CalligraphyFactory(attributeId);
+        mThemeColor = themeColor;
+        mCalligraphyFactory = new ColorographyFactory(attributeId, themeColor);
         setUpLayoutFactories(false);
     }
 
-    protected CalligraphyLayoutInflater(LayoutInflater original, Context newContext, int attributeId, final boolean cloned) {
+
+    protected ColorographyLayoutInflater(LayoutInflater original, Context newContext, int attributeId, int themeColor, final boolean cloned) {
         super(original, newContext);
         mAttributeId = attributeId;
-        mCalligraphyFactory = new CalligraphyFactory(attributeId);
+        mThemeColor = themeColor;
+        mCalligraphyFactory = new ColorographyFactory(attributeId, themeColor);
         setUpLayoutFactories(cloned);
     }
 
+
     @Override
     public LayoutInflater cloneInContext(Context newContext) {
-        return new CalligraphyLayoutInflater(this, newContext, mAttributeId, true);
+        return new ColorographyLayoutInflater(this, newContext, mAttributeId, mThemeColor, true);
     }
 
     // ===
@@ -66,16 +73,11 @@ class CalligraphyLayoutInflater extends LayoutInflater implements CalligraphyAct
      */
     private void setUpLayoutFactories(boolean cloned) {
         if (cloned) return;
+
         // If we are HC+ we get and set Factory2 otherwise we just wrap Factory1
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            if (getFactory2() != null && !(getFactory2() instanceof WrapperFactory2)) {
-                // Sets both Factory/Factory2
-                setFactory2(getFactory2());
-            }
-        }
-        // We can do this as setFactory2 is used for both methods.
-        if (getFactory() != null && !(getFactory() instanceof WrapperFactory)) {
-            setFactory(getFactory());
+        if (getFactory2() != null && !(getFactory2() instanceof WrapperFactory2)) {
+            // Sets both Factory/Factory2
+            setFactory2(getFactory2());
         }
     }
 
@@ -83,7 +85,7 @@ class CalligraphyLayoutInflater extends LayoutInflater implements CalligraphyAct
     public void setFactory(Factory factory) {
         // Only set our factory and wrap calls to the Factory trying to be set!
         if (!(factory instanceof WrapperFactory)) {
-            super.setFactory(new WrapperFactory(factory, this, mCalligraphyFactory));
+            super.setFactory(new WrapperFactory(factory, mCalligraphyFactory));
         } else {
             super.setFactory(factory);
         }
@@ -104,8 +106,7 @@ class CalligraphyLayoutInflater extends LayoutInflater implements CalligraphyAct
     private void setPrivateFactoryInternal() {
         // Already tried to set the factory.
         if (mSetPrivateFactory) return;
-        // Reflection (Or Old Device) skip.
-        if (!CalligraphyConfig.get().isReflection()) return;
+
         // Skip if not attached to an activity.
         if (!(getContext() instanceof Factory2)) {
             mSetPrivateFactory = true;
@@ -195,7 +196,7 @@ class CalligraphyLayoutInflater extends LayoutInflater implements CalligraphyAct
         // significant difference to performance on Android 4.0+.
 
         // If CustomViewCreation is off skip this.
-        if (!CalligraphyConfig.get().isCustomViewCreation()) return view;
+        if (!ColorographyConfig.get().isCustomViewCreation()) return view;
         if (view == null && name.indexOf('.') > -1) {
             if (mConstructorArgs == null)
                 mConstructorArgs = ReflectionUtils.getField(LayoutInflater.class, "mConstructorArgs");
@@ -228,25 +229,15 @@ class CalligraphyLayoutInflater extends LayoutInflater implements CalligraphyAct
     private static class WrapperFactory implements Factory {
 
         private final Factory mFactory;
-        private final CalligraphyLayoutInflater mInflater;
-        private final CalligraphyFactory mCalligraphyFactory;
+        private final ColorographyFactory mCalligraphyFactory;
 
-        public WrapperFactory(Factory factory, CalligraphyLayoutInflater inflater, CalligraphyFactory calligraphyFactory) {
+        public WrapperFactory(Factory factory, ColorographyFactory calligraphyFactory) {
             mFactory = factory;
-            mInflater = inflater;
             mCalligraphyFactory = calligraphyFactory;
         }
 
         @Override
         public View onCreateView(String name, Context context, AttributeSet attrs) {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-                return mCalligraphyFactory.onViewCreated(
-                        mInflater.createCustomViewInternal(
-                                null, mFactory.onCreateView(name, context, attrs), name, context, attrs
-                        ),
-                        context, attrs
-                );
-            }
             return mCalligraphyFactory.onViewCreated(
                     mFactory.onCreateView(name, context, attrs),
                     context, attrs
@@ -260,9 +251,9 @@ class CalligraphyLayoutInflater extends LayoutInflater implements CalligraphyAct
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private static class WrapperFactory2 implements Factory2 {
         protected final Factory2 mFactory2;
-        protected final CalligraphyFactory mCalligraphyFactory;
+        protected final ColorographyFactory mCalligraphyFactory;
 
-        public WrapperFactory2(Factory2 factory2, CalligraphyFactory calligraphyFactory) {
+        public WrapperFactory2(Factory2 factory2, ColorographyFactory calligraphyFactory) {
             mFactory2 = factory2;
             mCalligraphyFactory = calligraphyFactory;
         }
@@ -289,9 +280,9 @@ class CalligraphyLayoutInflater extends LayoutInflater implements CalligraphyAct
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private static class PrivateWrapperFactory2 extends WrapperFactory2 {
 
-        private final CalligraphyLayoutInflater mInflater;
+        private final ColorographyLayoutInflater mInflater;
 
-        public PrivateWrapperFactory2(Factory2 factory2, CalligraphyLayoutInflater inflater, CalligraphyFactory calligraphyFactory) {
+        public PrivateWrapperFactory2(Factory2 factory2, ColorographyLayoutInflater inflater, ColorographyFactory calligraphyFactory) {
             super(factory2, calligraphyFactory);
             mInflater = inflater;
         }

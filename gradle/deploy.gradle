@@ -18,7 +18,7 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 
 def isReleaseBuild() {
-    project.ext.isReleaseVersion
+    return !VERSION_NAME.contains("SNAPSHOT")
 }
 
 def getReleaseRepositoryUrl() {
@@ -30,18 +30,17 @@ def getSnapshotRepositoryUrl() {
 }
 
 def getRepositoryUsername() {
-    return hasProperty('sonatypeUsername') ? sonatypeUsername : ""
+    return hasProperty('sonatypeUsername') ? NEXUS_USERNAME : ""
 }
 
 def getRepositoryPassword() {
-    return hasProperty('sonatypePassword') ? sonatypePassword : ""
+    return hasProperty('sonatypePassword') ? NEXUS_PASSWORD : ""
 }
 
 // Debug Build or Release?
 if (isReleaseBuild()) {
     println "RELEASE BUILD $version"
 } else {
-    version += "-SNAPSHOT"
     println "DEBUG BUILD $version"
 }
 
