@@ -1,5 +1,6 @@
 package com.ftinc.colorography;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -18,6 +19,7 @@ import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.AppCompatEditText;
+import android.support.v7.widget.AppCompatRatingBar;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.SwitchCompat;
 import android.util.AttributeSet;
@@ -73,6 +75,7 @@ class ColorographyFactory {
     }
 
 
+    @SuppressLint("RestrictedApi")
     void onViewCreatedInternal(View view, final Context context, AttributeSet attrs) {
         int defaultColor = resolveDefaultColor(context, attrs);
         if (defaultColor != -1) {
@@ -107,6 +110,15 @@ class ColorographyFactory {
                     checkBox.setSupportButtonTintList(createCheckboxColorStateList(context, themeColor));
                 }
             }
+            else if (view instanceof AppCompatRatingBar) {
+                AppCompatRatingBar ratingBar = (AppCompatRatingBar) view;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    ratingBar.setProgressTintList(ColorStateList.valueOf(themeColor));
+                }
+                else {
+                    ratingBar.getProgressDrawable().setColorFilter(themeColor, PorterDuff.Mode.SRC_IN);
+                }
+            }
             else if (view instanceof SwitchCompat) {
                 SwitchCompat sw = (SwitchCompat) view;
                 sw.setThumbTintList(createSwitchThumbColorStateList(context, themeColor));
@@ -131,7 +143,7 @@ class ColorographyFactory {
                     progressBar.setIndeterminateTintList(ColorStateList.valueOf(themeColor));
                 }
                 else {
-                    progressBar.getIndeterminateDrawable().setColorFilter(themeColor, PorterDuff.Mode.SRC_ATOP);
+                    progressBar.getIndeterminateDrawable().setColorFilter(themeColor, PorterDuff.Mode.SRC_IN);
                 }
             }
             else {

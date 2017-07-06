@@ -18,6 +18,7 @@ public class ColorographyContextWrapper extends ContextWrapper {
     private final int mAttributeId;
     private final ThemeColorProvider mThemeColorProvider;
 
+
     /**
      * Uses the default configuration from {@link ColorographyConfig}
      *
@@ -89,5 +90,4 @@ public class ColorographyContextWrapper extends ContextWrapper {
         }
         return super.getSystemService(name);
     }
-
 }
