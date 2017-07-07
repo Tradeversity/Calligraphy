@@ -1,5 +1,9 @@
 # Changelog
 
+# 3.0.0 (07/07/2017)
+- Complete refactoring to use as a color themeing library instead of typefaces
+
+
 # 2.3.0 (11/05/2017)
 - Fix Toolbar TextView's layout race condition. [@ansman](https://github.com/ansman) #386, #368, #327, #280, #304, #363
 
