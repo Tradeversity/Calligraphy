@@ -26,5 +26,6 @@ public class TextViewWidgetFactory implements WidgetFactory<TextView> {
             ColorStateUtils.tintDrawable(drawables[i], tintColor);
         }
         view.setCompoundDrawablesRelativeWithIntrinsicBounds(drawables[0], drawables[1], drawables[2], drawables[3]);
+        view.setLinkTextColor(tintColor);
     }
 }
