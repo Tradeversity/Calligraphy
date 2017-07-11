@@ -85,7 +85,7 @@ public class ColorographyConfig {
         mAttrId = builder.attrId;
         mCustomViewCreation = builder.customViewCreation;
         final List<WidgetFactory<? extends View>> tempList = new ArrayList<>(DEFAULT_FACTORIES);
-        tempList.addAll(builder.mWidgetFactoryList);
+        tempList.addAll(0, builder.mWidgetFactoryList);
         mWidgetFactories = Collections.unmodifiableList(tempList);
     }
 
